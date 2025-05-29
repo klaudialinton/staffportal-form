@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        /* Navigation Bar */
+        .navbar {
+            background-color: #f8f8f8;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+        .navbar a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #1a73e8;
+            font-weight: bold;
+        }
+        .navbar .user-info {
+            margin-right: 20px;
+        }
+        .navbar .user-info a {
+            color: #333;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            position: fixed;
+            top: 50px;
+            left: 0;
+            height: 100%;
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+        .sidebar a {
+            display: block;
+            margin: 15px 0;
+            text-decoration: none;
+            color: #1a73e8;
+            font-weight: bold;
+        }
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+        }
+        .form-list-box {
+            border: 1px solid #000;
+            padding: 20px;
+            width: 1000px;
+            margin: 20px;
+        }
+        .form-list-box h3 {
+            margin: 0 0 20px 0;
+            font-size: 18px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .form-list-box button {
+            flex: 1;
+            padding: 10px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .form-list-box button:hover {
+            background-color: #1557b0;
+        }
+        /* Form Styling */
+        .form-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+        .form-container label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .form-container input, .form-container textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-container .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .form-container .halfday-options {
+            margin-left: 20px;
+        }
+        .form-container #total-days {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .form-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .form-container button[type="submit"] {
+            background-color: #1a73e8;
+            color: white;
+        }
+        .form-container button[type="submit"]:hover {
+            background-color: #1557b0;
+        }
+        .form-container button.cancel {
+            background-color: #ccc;
+            color: #333;
+        }
+        .form-container button.cancel:hover {
+            background-color: #bbb;
+        }
+        .form-container .add-claim-btn {
+            background-color: #4caf50;
+            color: white;
+            margin: 10px 0;
+        }
+        .form-container .add-claim-btn:hover {
+            background-color: #45a049;
+        }
+        .form-container .save-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+        .form-container .save-btn:hover {
+            background-color: #e68900;
+        }
+        .form-container .claim-entry {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .form-container .total-claim {
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+        .form-container .total-claim.active {
+            display: block;
+        }
+        /* Form Status Section (Table) */
+        .form-status-section {
+            margin-top: 20px;
+            width: 500px;
+            margin: 20px;
+        }
+        .form-status-section h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        .form-status-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+        }
+        .form-status-table th, .form-status-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .form-status-table th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+        }
+        .form-status-table tr {
+            cursor: pointer;
+        }
+        .form-status-table tr:hover {
+            background-color: #f0f0f0;
+        }
+        .form-status-table .status-waiting {
+            color: #ffa500;
+        }
+        .form-status-table .status-approved {
+            color: #008000;
+        }
+        .form-status-table .status-rejected {
+            color: #ff0000;
+        }
+        .form-status-table .status-cancelled {
+            color: #808080;
+        }
+        /* Form Details Section */
+        .form-details {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            width: 500px;
+            display: none;
+        }
+        .form-details.active {
+            display: block;
+        }
+        .form-details h4 {
+            margin: 0 0 10px 0;
+        }
+        .form-details p {
+            margin: 5px 0;
+        }
+        .form-details .close-btn {
+            background-color: #ccc;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .form-details .close-btn:hover {
+            background-color: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div>
+            <a href="#">HOME</a>
+            <a href="#">PROFILE</a>
+            <a href="#">CALENDER</a>
+            <a href="#">REQUEST FORM</a>
+        </div>
+        <div class="user-info">
+            Hi User, <a href="#">Log Out</a>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="#">PERSONAL</a>
+        <a href="#">COMPETENCY</a>
+        <a href="#">CERTIFICATION</a>
+        <a href="#">PAY SLIP</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="form-list-box">
+            <h3>Form List</h3>
+            <div class="button-container">
+                <button onclick="showForm('leave-form')">Leave Form</button>
+                <button onclick="showForm('expense-form')">Expense Form</button>
+                <button onclick="showForm('ot-form')">OT Form</button>
+            </div>
+
+            <!-- Leave Form -->
+            <div id="leave-form" class="form-container">
+                <h4>Leave Request Form</h4>
+                <form id="leave-form-submit" onsubmit="handleFormSubmit(event, 'Leave Request')">
+                    <label for="leave-start-date">Start Date:</label>
+                    <input type="date" id="leave-start-date" name="leave-start-date" required oninput="calculateTotalDays()">
+                    
+                    <label for="leave-end-date">End Date:</label>
+                    <input type="date" id="leave-end-date" name="leave-end-date" required oninput="calculateTotalDays()">
+                    
+                    <label>
+                        <input type="checkbox" id="halfday-checkbox" name="halfday" onchange="toggleHalfdayOptions(); calculateTotalDays()">
+                        Halfday
+                    </label>
+                    <div class="halfday-options">
+                        <label>
+                            <input type="radio" id="halfday-am" name="halfday-period" value="AM" disabled>
+                            AM
+                        </label>
+                        <label>
+                            <input type="radio" id="halfday-pm" name="halfday-period" value="PM" disabled>
+                            PM
+                        </label>
+                    </div>
+                    
+                    <label for="leave-reason">Reason for Leave:</label>
+                    <textarea id="leave-reason" name="leave-reason" rows="4" required></textarea>
+                    
+                    <div id="total-days">Total Day Leave: 0 days</div>
+                    
+                    <div class="button-group">
+                        <button type="submit">Submit Leave Request</button>
+                        <button type="button" class="cancel" onclick="hideForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Expense Form -->
+            <div id="expense-form" class="form-container">
+                <h4>Expense Request Form</h4>
+                <form id="expense-form-submit" onsubmit="handleFormSubmit(event, 'Expense Request')">
+                    <label for="expense-date">Expense Date:</label>
+                    <input type="date" id="expense-date" name="expense-date" required>
+                    
+                    <label for="expense-description">Description:</label>
+                    <textarea id="expense-description" name="expense-description" rows="4" required></textarea>
+
+                    <div id="claim-entries">
+                        <!-- First Claim Entry -->
+                        <div class="claim-entry">
+                            <label for="attachment-1">Upload Attachment:</label>
+                            <input type="file" id="attachment-1" name="attachment-1">
+                            
+                            <label for="total-rm-1">Total (RM):</label>
+                            <input type="number" id="total-rm-1" name="total-rm-1" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <button type="button" class="add-claim-btn" onclick="addClaimEntry()">Add Claim</button>
+
+                    <div class="button-group">
+                        <button type="button" class="save-btn" onclick="saveClaims()">Save</button>
+                        <button type="submit">Submit</button>
+                        <button type="button" class="cancel" onclick="hideForm()">Cancel</button>
+                    </div>
+
+                    <div id="total-claim" class="total-claim">Total Claim: RM 0.00</div>
+                </form>
+            </div>
+
+            <!-- OT Form -->
+            <div id="ot-form" class="form-container">
+                <h4>Overtime Request Form</h4>
+                <form id="ot-form-submit" onsubmit="handleFormSubmit(event, 'OT Request')">
+                    <label for="ot-date">OT Date:</label>
+                    <input type="date" id="ot-date" name="ot-date" required>
+                    
+                    <label for="ot-hours">Hours Requested:</label>
+                    <input type="number" id="ot-hours" name="ot-hours" step="0.5" required>
+                    
+                    <label for="ot-reason">Reason for OT:</label>
+                    <textarea id="ot-reason" name="ot-reason" rows="4" required></textarea>
+                    
+                    <div class="button-group">
+                        <button type="submit">Submit OT Request</button>
+                        <button type="button" class="cancel" onclick="hideForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Form Status Section (Table) -->
+        <div class="form-status-section" id="form-status-section">
+            <h3>Form Status</h3>
+            <table class="form-status-table" id="form-status-table">
+                <thead>
+                    <tr>
+                        <th>Type of Form</th>
+                        <th>Date of Applied</th>
+                        <th>Status</th>
+                        <th>Date of Update</th>
+                    </tr>
+                </thead>
+                <tbody id="form-status-list">
+                    <!-- Table rows will be added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Form Details Section -->
+        <div class="form-details" id="form-details">
+            <!-- Form details will be shown here -->
+        </div>
+    </div>
+
+    <script>
+        // Array to store form submissions
+        const formSubmissions = [];
+        let claimCount = 1; // Track the number of claim entries
+
+        function showForm(formId) {
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(formId).classList.add('active');
+            // Reset claim entries for Expense Form
+            if (formId === 'expense-form') {
+                claimCount = 1;
+                document.getElementById('claim-entries').innerHTML = `
+                    <div class="claim-entry">
+                        <label for="attachment-1">Upload Attachment:</label>
+                        <input type="file" id="attachment-1" name="attachment-1">
+                        <label for="total-rm-1">Total (RM):</label>
+                        <input type="number" id="total-rm-1" name="total-rm-1" step="0.01" required>
+                    </div>
+                `;
+                document.getElementById('total-claim').classList.remove('active');
+            }
+        }
+
+        function hideForm() {
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById('halfday-checkbox').checked = false;
+            toggleHalfdayOptions();
+            document.getElementById('total-days').textContent = 'Total Day Leave: 0 days';
+        }
+
+        function toggleHalfdayOptions() {
+            const halfdayCheckbox = document.getElementById('halfday-checkbox');
+            const amRadio = document.getElementById('halfday-am');
+            const pmRadio = document.getElementById('halfday-pm');
+            
+            if (halfdayCheckbox.checked) {
+                amRadio.disabled = false;
+                pmRadio.disabled = false;
+                amRadio.checked = true;
+            } else {
+                amRadio.disabled = true;
+                pmRadio.disabled = true;
+                amRadio.checked = false;
+                pmRadio.checked = false;
+            }
+        }
+
+        function calculateTotalDays() {
+            const startDateInput = document.getElementById('leave-start-date').value;
+            const endDateInput = document.getElementById('leave-end-date').value;
+            const halfdayCheckbox = document.getElementById('halfday-checkbox');
+            const totalDaysOutput = document.getElementById('total-days');
+
+            if (startDateInput && endDateInput) {
+                const startDate = new Date(startDateInput);
+                const endDate = new Date(endDateInput);
+                const timeDiff = endDate - startDate;
+                let totalDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+
+                if (halfdayCheckbox.checked) {
+                    totalDays -= 0.5;
+                }
+
+                totalDays = Math.max(totalDays, 0);
+                totalDaysOutput.textContent = `Total Day Leave: ${totalDays} days`;
+            } else {
+                totalDaysOutput.textContent = 'Total Day Leave: 0 days';
+            }
+        }
+
+        function addClaimEntry() {
+            if (claimCount < 2) { // Limit to 2 claims as per requirement
+                claimCount++;
+                const claimEntries = document.getElementById('claim-entries');
+                const newEntry = document.createElement('div');
+                newEntry.classList.add('claim-entry');
+                newEntry.innerHTML = `
+                    <label for="attachment-${claimCount}">Upload Attachment:</label>
+                    <input type="file" id="attachment-${claimCount}" name="attachment-${claimCount}">
+                    <label for="total-rm-${claimCount}">Total (RM):</label>
+                    <input type="number" id="total-rm-${claimCount}" name="total-rm-${claimCount}" step="0.01" required>
+                `;
+                claimEntries.appendChild(newEntry);
+            }
+        }
+
+        function saveClaims() {
+            const totals = [];
+            for (let i = 1; i <= claimCount; i++) {
+                const totalInput = document.getElementById(`total-rm-${i}`);
+                const totalValue = parseFloat(totalInput.value) || 0;
+                totals.push(totalValue);
+            }
+
+            const totalClaim = totals.reduce((sum, total) => sum + total, 0).toFixed(2);
+            const totalClaimDiv = document.getElementById('total-claim');
+            totalClaimDiv.textContent = `Total Claim: RM ${totalClaim}`;
+            totalClaimDiv.classList.add('active');
+        }
+
+        function handleFormSubmit(event, formType) {
+            event.preventDefault();
+
+            // Get current date and time (May 26, 2025, 12:10 PM +08)
+            const appliedDate = new Date('2025-05-26T12:10:00+08:00');
+            const formattedDate = appliedDate.toLocaleString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
+            });
+
+            // Collect form details
+            let formDetails = {};
+            if (formType === 'Leave Request') {
+                const startDate = document.getElementById('leave-start-date').value;
+                const endDate = document.getElementById('leave-end-date').value;
+                const halfday = document.getElementById('halfday-checkbox').checked;
+                const halfdayPeriod = halfday ? (document.getElementById('halfday-am').checked ? 'AM' : 'PM') : 'N/A';
+                const reason = document.getElementById('leave-reason').value;
+                const totalDays = document.getElementById('total-days').textContent.replace('Total Day Leave: ', '');
+
+                formDetails = {
+                    startDate,
+                    endDate,
+                    halfday: halfday ? 'Yes' : 'No',
+                    halfdayPeriod,
+                    reason,
+                    totalDays
+                };
+            } else if (formType === 'Expense Request') {
+                const expenseDate = document.getElementById('expense-date').value;
+                const description = document.getElementById('expense-description').value;
+                const claims = [];
+                let totalClaim = 0;
+
+                for (let i = 1; i <= claimCount; i++) {
+                    const attachmentInput = document.getElementById(`attachment-${i}`);
+                    const totalInput = document.getElementById(`total-rm-${i}`);
+                    const totalValue = parseFloat(totalInput.value) || 0;
+                    totalClaim += totalValue;
+
+                    claims.push({
+                        attachment: attachmentInput.files.length > 0 ? attachmentInput.files[0].name : 'None',
+                        total: totalValue.toFixed(2)
+                    });
+                }
+
+                formDetails = {
+                    expenseDate,
+                    description,
+                    claims,
+                    totalClaim: totalClaim.toFixed(2)
+                };
+            } else if (formType === 'OT Request') {
+                const otDate = document.getElementById('ot-date').value;
+                const hours = document.getElementById('ot-hours').value;
+                const reason = document.getElementById('ot-reason').value;
+
+                formDetails = {
+                    otDate,
+                    hours,
+                    reason
+                };
+            }
+
+            // Store the submission
+            const submission = {
+                id: Date.now(),
+                formType,
+                appliedDate: formattedDate,
+                status: 'Waiting for Approve',
+                updatedDate: formattedDate,
+                details: formDetails
+            };
+            formSubmissions.unshift(submission);
+
+            // Update the table
+            updateFormStatusTable();
+
+            // Hide the form after submission
+            hideForm();
+        }
+
+        function updateFormStatusTable() {
+            const formStatusList = document.getElementById('form-status-list');
+            formStatusList.innerHTML = '';
+
+            formSubmissions.forEach((submission, index) => {
+                const row = document.createElement('tr');
+                row.dataset.index = index;
+                row.innerHTML = `
+                    <td>${submission.formType}</td>
+                    <td>${submission.appliedDate}</td>
+                    <td><span class="status-${submission.status.toLowerCase().replace(' ', '-')}">${submission.status}</span></td>
+                    <td>${submission.updatedDate}</td>
+                `;
+                row.onclick = () => showFormDetails(index);
+                formStatusList.appendChild(row);
+            });
+        }
+
+        function showFormDetails(index) {
+            const submission = formSubmissions[index];
+            const formDetailsDiv = document.getElementById('form-details');
+            formDetailsDiv.innerHTML = '';
+
+            let detailsHtml = `<h4>${submission.formType} Details</h4>`;
+            if (submission.formType === 'Leave Request') {
+                detailsHtml += `
+                    <p><strong>Start Date:</strong> ${submission.details.startDate}</p>
+                    <p><strong>End Date:</strong> ${submission.details.endDate}</p>
+                    <p><strong>Halfday:</strong> ${submission.details.halfday}</p>
+                    <p><strong>Halfday Period:</strong> ${submission.details.halfdayPeriod}</p>
+                    <p><strong>Reason:</strong> ${submission.details.reason}</p>
+                    <p><strong>Total Day Leave:</strong> ${submission.details.totalDays}</p>
+                `;
+            } else if (submission.formType === 'Expense Request') {
+                detailsHtml += `
+                    <p><strong>Expense Date:</strong> ${submission.details.expenseDate}</p>
+                    <p><strong>Description:</strong> ${submission.details.description}</p>
+                `;
+                submission.details.claims.forEach((claim, index) => {
+                    detailsHtml += `
+                        <p><strong>Claim ${index + 1} Attachment:</strong> ${claim.attachment}</p>
+                        <p><strong>Claim ${index + 1} Total (RM):</strong> ${claim.total}</p>
+                    `;
+                });
+                detailsHtml += `<p><strong>Total Claim:</strong> RM ${submission.details.totalClaim}</p>`;
+            } else if (submission.formType === 'OT Request') {
+                detailsHtml += `
+                    <p><strong>OT Date:</strong> ${submission.details.otDate}</p>
+                    <p><strong>Hours Requested:</strong> ${submission.details.hours}</p>
+                    <p><strong>Reason:</strong> ${submission.details.reason}</p>
+                `;
+            }
+
+            // Add the Close button
+            detailsHtml += `<button class="close-btn" onclick="hideFormDetails()">Close</button>`;
+
+            formDetailsDiv.innerHTML = detailsHtml;
+            formDetailsDiv.classList.add('active');
+        }
+
+        function hideFormDetails() {
+            const formDetailsDiv = document.getElementById('form-details');
+            formDetailsDiv.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
